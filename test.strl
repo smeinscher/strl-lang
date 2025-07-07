@@ -1,0 +1,4 @@
+# Comment
+print "String";
+set a = 4;
+print "This is a string";
