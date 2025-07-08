@@ -3,3 +3,8 @@ lexer.o
 strllang
 strllang.ilk
 strllang.pdb
+*.o
+*.exe
+strllang
+compile_commands.json
+.clangd

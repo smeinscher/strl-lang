@@ -1,11 +1,12 @@
 # This is the end goal of the MVP of strl-lang
 print "Hello, World!";
 
-set a = 1;
-set b = 2;
-set c = a + b;
+a = 1;
+b = 2;
+c = a + b;
 
 while c >= 0;
+    print "Start of loop";
     print c;
     c = c - 1;
     b = b / 2;
@@ -14,10 +15,10 @@ while c >= 0;
     print a;
 endwhile;
 
-if c == 0;
-    print "strl-lang";
-endif;
-
-if false;
-    print "This shouldn't be printing!";
-endif;
+#if c == 0;
+#    print "strl-lang";
+#endif;
+#
+#if false;
+#    print "This shouldn't be printing!";
+#endif;

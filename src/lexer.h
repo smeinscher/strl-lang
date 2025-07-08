@@ -2,19 +2,20 @@
 #define LEXER_H
 
 typedef enum {
-    TOKEN_EOF = -1,
-    TOKEN_NEWLINE = 0,
-    TOKEN_INT = 1,
-    TOKEN_STRING = 2,
-    TOKEN_TRUE = 3,
-    TOKEN_FALSE = 4,
-
+    TOKEN_INT = 0,
+    TOKEN_STRING = 1,
+    TOKEN_TRUE = 2,
+    TOKEN_FALSE = 3,
+    TOKEN_VARIABLE = 4,
     // Keywords
     TOKEN_SET = 10,
 
     // Labels
     TOKEN_WHILE = 21,
-    TOKEN_IF = 22,
+    TOKEN_ENDWHILE = 22,
+    TOKEN_IF = 23,
+    TOKEN_ENDIF = 24,
+    TOKEN_PRINT = 25,
 
     // Operators
     TOKEN_SET_EQUAL = 30,
@@ -43,4 +44,4 @@ token_t *text_to_token(char *text);
 
 void free_token(token_t *token);
 
-#endif // LEXER_H
+#endif  // LEXER_H

@@ -1,4 +1,8 @@
 # Comment
-print "String";
-set a = 4;
-print "This is a string";
+i = 1;
+print i;
+print "Testing a sentence";
+while i < 3;
+    print i;
+    i = i + 1;
+endwhile;
