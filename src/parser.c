@@ -30,7 +30,6 @@ static int add_child(ast_node_t *parent, ast_node_t *child) {
 }
 
 static int add_to_ast_recursive(ast_node_t *parent, ast_node_t *node) {
-    // printf("Node Value: %s\n", node->token->value);
     if (parent->child_count == 0) {
         return add_child(parent, node);
     }
@@ -56,7 +55,14 @@ static int add_to_ast_recursive(ast_node_t *parent, ast_node_t *node) {
                 return 2;
         }
     } else if ((child->kind == LOOP || child->kind == BRANCH) &&
+               (node->kind != LOOP && node->kind != BRANCH) &&
                child->scope == node->scope) {
+        return add_to_ast_recursive(child, node);
+    } else if ((child->kind == LOOP || child->kind == BRANCH) &&
+               child->scope != node->scope) {
+        if (parent->scope == node->scope) {
+            return add_child(parent, node);
+        }
         return add_to_ast_recursive(child, node);
     } else {
         return add_child(parent, node);
@@ -65,7 +71,8 @@ static int add_to_ast_recursive(ast_node_t *parent, ast_node_t *node) {
     return -1;
 }
 
-int add_to_ast(ast_t *ast, token_t *token, int line, int scope) {
+int add_to_ast(ast_t *ast, token_t *token, int line, int scope,
+               int parent_scope) {
     ast_node_t *node = malloc(sizeof(ast_node_t));
     node->token = token;
     node->parent = NULL;
@@ -73,6 +80,7 @@ int add_to_ast(ast_t *ast, token_t *token, int line, int scope) {
     node->child_count = 0;
     node->line_number = line;
     node->scope = scope;
+    node->parent_scope = parent_scope;
     switch (token->token_type) {
         case TOKEN_INT:
         case TOKEN_STRING:
@@ -128,79 +136,6 @@ int add_to_ast(ast_t *ast, token_t *token, int line, int scope) {
     }
     ast_node_t *current = ast->head;
     return add_to_ast_recursive(current, node);
-    // for (int i = current->child_count - 1; i >= 0; i--) {
-    //     // if (i == current->child_count - 1) {
-    //     if (current->children[i]->scope < node->scope) {
-    //         printf("1: %s parent: %s\n", node->token->value,
-    //                current->token == NULL ? "NULL" : current->token->value);
-    //         return add_child(current, node);
-    //     }
-    //     if (current->scope == node->scope) {
-    //         if (current->children[i]->kind != VARIABLE &&
-    //             current->children[i]->kind != LITERAL &&
-    //             node->kind != OPERATOR && node->kind != LITERAL &&
-    //             node->kind != VARIABLE) {
-    //             printf("2: %s parent: %s\n", node->token->value,
-    //                    current->token == NULL ? "NULL" :
-    //                    current->token->value);
-    //             return add_child(current, node);
-    //         }
-    //     }
-    //     // }
-    //     if (current->children[i]->scope == node->scope &&
-    //         current->children[i]->line_number <= node->line_number) {
-    //         parent = current;
-    //         current = current->children[i];
-    //         // if (current->child_count < 2) {
-    //         switch (current->kind) {
-    //             case OPERATOR:
-    //                 if (node->kind == LITERAL || node->kind == VARIABLE) {
-    //                     printf("3: %s parent: %s\n", node->token->value,
-    //                            current->token->value);
-    //                     return add_child(current, node);
-    //                 }
-    //                 printf("operator\n");
-    //             case LITERAL:
-    //             case VARIABLE: {
-    //                 if (node->kind == LITERAL || node->kind == VARIABLE ||
-    //                     node->line_number != current->line_number) {
-    //                     break;
-    //                 }
-    //                 printf("4: %s child: %s\n", node->token->value,
-    //                        current->token->value);
-    //                 int result = add_child(node, current);
-    //                 if (result != 0) {
-    //                     return result;
-    //                 }
-    //                 for (int i = 0; i < parent->child_count; i++) {
-    //                     if (parent->children[i] == current) {
-    //                         parent->children[i] = node;
-    //                         break;
-    //                     }
-    //                 }
-    //                 return result;
-    //             }
-    //             case ASSIGNMENT:
-    //             case BRANCH:
-    //             case LOOP:
-    //             case PRINT:
-    //                 if (current->child_count == 0 &&
-    //                     (node->kind == LITERAL || node->kind == VARIABLE ||
-    //                      node->kind == OPERATOR)) {
-    //                     printf("5: %s parent: %s\n", node->token->value,
-    //                            current->token->value);
-    //                     return add_child(current, node);
-    //                 }
-    //                 break;
-    //             default:
-    //                 break;
-    //         }
-    //         // }
-    //         i = current->child_count - 1;
-    //     }
-    //}
-    // printf("Error: Could not add node '%s'\n", node->token->value);
-    // return 1;
 }
 
 static void free_tree_nodes_recursive(ast_node_t *node) {

@@ -130,17 +130,22 @@ int main(int argc, char **argv) {
                            current->token_type, current->value,
                            current->length);
                 }
+                int parent_scope = current_scope;
                 if (current->token_type == TOKEN_WHILE ||
                     current->token_type == TOKEN_IF) {
                     current_scope++;
                 } else if (current->token_type == TOKEN_ENDWHILE ||
                            current->token_type == TOKEN_ENDIF) {
                     current_scope--;
+                    parent_scope = current_scope;
                     current = current->next_token;
                     continue;
                 }
-                int result =
-                    add_to_ast(&ast, current, current_line, current_scope);
+                if (verbose) {
+                    printf("Current Scope: %d\n", current_scope);
+                }
+                int result = add_to_ast(&ast, current, current_line,
+                                        current_scope, parent_scope);
                 if (result != 0) {
                     printf("Error: Invalid syntax at line %d\n", current_line);
                     return 5;

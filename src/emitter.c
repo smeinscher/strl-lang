@@ -139,16 +139,23 @@ static char *execute_recursive(ast_node_t *node, char **var_table) {
                     return result ? "1" : "0";
                 }
                 default:
-                    printf("Invalid token type for operators\n");
+                    printf("Invalid token type for operators (%d)\n",
+                           node->token->token_type);
                     return NULL;
             }
             break;
         case LITERAL:
+            if (node->token->token_type == TOKEN_FALSE) {
+                return "0";
+            } else if (node->token->token_type == TOKEN_TRUE) {
+                return "1";
+            }
             return node->token->value;
         case VARIABLE:
             char *val = var_table[hash(node->token->value)];
             if (val == NULL) {
-                printf("Variable value not set\n");
+                printf("Variable value not set for node (%s) on line %d\n",
+                       node->token->value, node->line_number);
             }
             return val;
         case ASSIGNMENT:
@@ -197,8 +204,16 @@ static char *execute_recursive(ast_node_t *node, char **var_table) {
                 var_table[hash(token1->value)] = buffer;
                 return buffer;
             }
-        case BRANCH:
-            break;
+        case BRANCH: {
+            ast_node_t *expr = node->children[0];
+            int result = atoi(execute_recursive(expr, var_table));
+            if (result == 1) {
+                for (int i = 1; i < node->child_count; i++) {
+                    execute_recursive(node->children[i], var_table);
+                }
+            }
+            return NULL;
+        }
         case LOOP: {
             ast_node_t *expr = node->children[0];
             int result = atoi(execute_recursive(expr, var_table));
@@ -243,7 +258,7 @@ static char *execute_recursive(ast_node_t *node, char **var_table) {
 int execute(ast_t *ast) {
     char *var_table[VAR_TABLE_SIZE] = {0};
     for (int i = 0; i < ast->head->child_count; i++) {
-        char *val = execute_recursive(ast->head->children[i], var_table);
+        execute_recursive(ast->head->children[i], var_table);
     }
     for (int i = 0; i < VAR_TABLE_SIZE; i++) {
         free(var_table[i]);

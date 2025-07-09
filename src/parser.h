@@ -21,6 +21,7 @@ typedef struct ast_node {
     int child_count;
     int line_number;
     int scope;
+    int parent_scope;
     ast_node_kind_t kind;
 } ast_node_t;
 
@@ -28,7 +29,8 @@ typedef struct ast {
     ast_node_t *head;
 } ast_t;
 
-int add_to_ast(ast_t *ast, token_t *token, int line, int scope);
+int add_to_ast(ast_t *ast, token_t *token, int line, int scope,
+               int parent_scope);
 
 void free_tree_nodes(ast_t *ast);
 

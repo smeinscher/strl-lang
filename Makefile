@@ -21,5 +21,6 @@ parser.o: src/parser.c src/parser.h
 emitter.o: src/emitter.c src/emitter.h
 	$(CC) $(CFLAGS) -c src/emitter.c -o emitter.o
 
+.PHONY: clean
 clean:
-	rm main.o lexer.o parser.o emitter.o strllang strllang.ilk strllang.pdb
+	rm *.o ${TARGET} strllang.ilk strllang.pdb
